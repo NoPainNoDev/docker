@@ -1,0 +1,16 @@
+# dynamic.yml - dynamic config
+http:
+  routers:
+    # /dashboard, /api 로 들어오는 요청에 대해 auth 미들웨어를 거친다.
+    dashboard:
+      rule: "PathPrefix(`/dashboard`) || PathPrefix(`/api`)"
+      service: api@internal
+      middlewares:
+        - auth
+        
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          # htpasswd -nb [유저] "[비밀번호]" 결과값
+          - "admin:$apr1$QdIMZSuZ$5wROxTKj7l6GY.ejj46gm."

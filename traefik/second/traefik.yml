@@ -1,0 +1,23 @@
+# traefik.yml - static config
+global:
+  checkNewVersion: true
+  sendAnonymousUsage: true
+
+entryPoints:
+  web:
+    address: ":8090" # 서비스 포트
+
+  dashboard:
+    address: ":8080" # 대시보드 접속포트
+
+api:
+  dashboard: true
+
+providers:
+  # traefik에게 도커로 띄운 서비스에 대한 정보를 제공하기 위함
+  docker: 
+    watch: true  # 도커 서비스를 계속 모니터링 
+    network: "proxy"  
+    endpoint: "unix:///var/run/docker.sock"  # traefik과 docker 통신하기 위한 경로
+  file:
+    filename: /dynamic.yml  # 라우팅 규칙 설정파일
