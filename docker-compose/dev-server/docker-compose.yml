@@ -1,0 +1,40 @@
+version: "3"  
+# Docker Compose 문서의 버전 명시
+
+# 네트워크 설정 섹션
+networks:
+  db-net: # 네트워크 이름 설정
+    driver: bridge # 네트워크 타입 지정
+
+# 서비스 정의 섹션
+services:
+  git: # 첫 번째 서비스 이름
+    container_name: gitea # 컨테이너 이름 지정
+    build: ./gitea # 빌드 컨텍스트 경로
+    restart: always # 재시작 정책 설정
+    ports:
+      - 3000:3000 # 포트 매핑
+    volumes:
+      - ./gitea/data:/data # 볼륨 마운트
+    environment: # 환경변수 세팅
+      - USER_UID=1000 # 사용자 UID 설정
+      - USER_GID=1000 # 사용자 GID 설정
+    networks:
+      - db-net # 사용 네트워크
+
+  db: # 두 번째 서비스 이름
+    container_name: mysql # 컨테이너 이름 지정
+    build: ./mysql # 빌드 컨텍스트 경로
+    restart: always # 재시작 정책 설정
+    ports:
+      - 3306:3306 # 포트 매핑
+    volumes:
+      - ./mysql/initdb.d:/docker-entrypoint-initdb.d # 초기화 스크립트 볼륨 마운트
+    environment: # 환경변수 세팅
+      - MYSQL_ROOT_PASSWORD=rootpassword # MySQL 루트 비밀번호 설정
+      - TZ=Asia/Seoul # 시간대 설정
+    command: # MySQL 서버 커스텀 커맨드
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    networks:
+      - db-net # 사용 네트워크
